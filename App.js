@@ -1,13 +1,48 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import HomeScreen from './screens/HomeScreen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import 'react-native-gesture-handler'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import MapScreen from './screens/MapScreen';
+import LoginScreen from './screens/auth/LoginScreen';
+import RegisterScreen from './screens/auth/RegisterScreen';
+import CreateLocation from './screens/CreateLocation';
+import DriverScreen from './screens/DriverScreen';
+import findCars from './screens/findCars';
 
 export default function App() {
+  const Stack = createStackNavigator();
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <NavigationContainer>
+        <SafeAreaProvider>
+          <KeyboardAvoidingView keyboardVerticalOffset={Platform.OS === "ios" ? -64 : 0} behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
+            <Stack.Navigator>
+              <Stack.Screen name="LoginScreen" component={LoginScreen}/>
+              <Stack.Screen name="RegisterScreen" component={RegisterScreen}/>
+              <Stack.Screen name="CreateLocation" component={CreateLocation}/>
+              <Stack.Screen name="DriverScreen" component={DriverScreen}/>
+              <Stack.Screen name="FindCars" component={findCars}/>
+              <Stack.Screen name="HomeScreen" component={HomeScreen} options={{
+                headerShown: false,
+              }}></Stack.Screen>
+              <Stack.Screen name="MapScreen" component={MapScreen} options={{
+                headerShown: false,
+              }}></Stack.Screen>
+            </Stack.Navigator>
+            </KeyboardAvoidingView>
+        </SafeAreaProvider>
+
+      </NavigationContainer>
+      
+      
+    </Provider>
   );
 }
 
