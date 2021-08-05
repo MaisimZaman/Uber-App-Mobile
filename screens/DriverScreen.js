@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react-native'
 import tw from 'tailwind-react-native-classnames'
 import { auth, db } from '../firebase'
@@ -27,7 +27,7 @@ const data = [
     },
 ]
 
-export default function DriverScreen() {
+export default function DriverScreen({navigation}) {
 
     const [selected, setSelected] = useState(null)
     const [uberExists, setUberExists] = useState(null)
@@ -35,17 +35,23 @@ export default function DriverScreen() {
     const origin = useSelector(selectOrigin)
 
 
+    useEffect(() => {
+        db.collection("drivers").where("driverId", "==",auth.currentUser.uid).get().then((snapshot) => {
+            if (snapshot.size > 0){
+                setUberExists(true)
+                navigation.navigate("DriverMapScreen")
+
+            }
+            else {
+                setUberExists(false)
+            }
+        })
+
+    }, [uberExists])
+
+
 
     function addDriver(){
-
-        //db.collection("drivers").doc(auth.currentUser.uid).get().then((doc) => {
-         //   if (doc.exists){
-          //      setUberExists(true)
-           // }
-           // else {
-                //setUberExists(false)
-            //}
-        //})
 
     
         db.collection("drivers")
@@ -55,6 +61,8 @@ export default function DriverScreen() {
             uberType: selected.title,
             location: origin
         })
+
+        setUberExists(true)
 
         
 

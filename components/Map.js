@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import tw from 'tailwind-react-native-classnames'
 import { useSelector } from 'react-redux'
-import { selectOrigin } from '../slices/navSlice'
+import { selectOrigin, selectPickUpLocation } from '../slices/navSlice'
 import { selectDestination } from '../slices/navSlice'
 import { setTravelTimeInformation } from '../slices/navSlice'
 import MapViewDirections from 'react-native-maps-directions'
@@ -12,11 +12,13 @@ import { useDispatch } from 'react-redux'
 
 
 
-export default function Map() {
+export default function Map({isDriverMap}) {
 
     const origin = useSelector(selectOrigin)
  
     const destination = useSelector(selectDestination)
+
+    const pickUpLocation = useSelector(selectPickUpLocation)
 
 
     const mapRef = useRef()
@@ -64,7 +66,7 @@ export default function Map() {
             longitude: destination.location.lng
 
         }}
-        title="This is where you will go"
+        title={isDriverMap ? "You will take your client here"  : "This is where you will go"} 
         description={destination.description}
         identifier="destination"
         ></Marker>
@@ -72,8 +74,31 @@ export default function Map() {
         }
     }
 
+
+    function pickUpLocationMarker(){
+        if (pickUpLocation != null && isDriverMap == true){
+            
+            return (
+                <Marker
+        coordinate={{
+            latitude: pickUpLocation.location.lat,
+            longitude: pickUpLocation.location.lng
+
+        }}
+        title="Pick Up your Client here"
+        description={pickUpLocation.description}
+        identifier="pickUpLocation"
+        ></Marker>
+            )
+        }
+
+        
+    }
+
+    
+
     function drawMapLines(){
-        if (origin != null && destination != null){
+        if (origin != null && destination != null   && isDriverMap == false){
 
            
             
@@ -86,6 +111,29 @@ export default function Map() {
                 strokeWidth={3}
                 strokeColor={"black"}
              />
+            )
+        }
+
+        else if (origin != null && destination != null && pickUpLocation != null && isDriverMap == true){
+            return (
+                <>
+                <MapViewDirections
+                lineDashPattern={[0]}
+                origin={origin.description}
+                destination={pickUpLocation.description}
+                apikey={GOOGLE_MAPS_KEY}
+                strokeWidth={3}
+                strokeColor={"black"} />
+
+            <MapViewDirections
+                lineDashPattern={[0]}
+                origin={pickUpLocation.description}
+                destination={destination.description}
+                apikey={GOOGLE_MAPS_KEY}
+                strokeWidth={3}
+                strokeColor={"black"} />
+
+                </>
             )
         }
     }
@@ -104,6 +152,8 @@ export default function Map() {
       longitudeDelta: 0.005,
      }}>
 
+        {pickUpLocationMarker()}
+        
         {drawMapLines()}
          
          

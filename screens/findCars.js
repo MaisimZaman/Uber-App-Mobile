@@ -3,12 +3,12 @@ import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react
 import { auth, db } from '../firebase'
 import tw from 'tailwind-react-native-classnames'
 import { useSelector } from 'react-redux'
-import { selectOrigin } from '../slices/navSlice'
+import { selectDestination, selectOrigin } from '../slices/navSlice'
 import {GOOGLE_MAPS_KEY} from '@env'
 
 export default function findCars(props) {
 
-    const {carType, carImage} = props.route.params
+    const {carType, carImage, drivePrice, driveTime} = props.route.params
 
     const [allCars, setAllCars] = useState([])
 
@@ -17,6 +17,8 @@ export default function findCars(props) {
     const [distance, setDistance] = useState('')
 
     const origin = useSelector(selectOrigin)
+
+    const destenation = useSelector(selectDestination)
 
 
     useEffect(() => {
@@ -29,6 +31,22 @@ export default function findCars(props) {
             }))))
         
     }, [])
+
+    function handleDriverRequest(driverId){
+        db.collection("driverRequest")
+            .doc(driverId)
+            .collection("thisDriverRequests")
+            .add({
+                clientName: auth.currentUser.displayName,
+                clientId: auth.currentUser.uid,
+                clientLocation: origin,
+                clientDestination: destenation,
+                drivePrice: drivePrice,
+                driveTime: driveTime,
+        
+            })
+    
+    }
 
     const getTravelTime =  (driverLoc) => {
         fetch(`https://maps.googleapis.com/maps/api/distancematrix/json? units=imperial&origins=${origin.description}&destinations=${driverLoc}&key=${GOOGLE_MAPS_KEY}`)
@@ -76,6 +94,14 @@ export default function findCars(props) {
                 )}  
             
             ></FlatList>
+
+                <TouchableOpacity style={tw`bg-black py-3 m-3`} disabled={!selected}
+                   onPress={() => handleDriverRequest(selected.data.driverId)}
+                >
+                    <Text style={tw`text-center text-white`}>
+                        Choose to ride with {selected?.data.driverName}
+                        </Text>
+                </TouchableOpacity>
         </View>
     )
 }

@@ -14,6 +14,9 @@ import RegisterScreen from './screens/auth/RegisterScreen';
 import CreateLocation from './screens/CreateLocation';
 import DriverScreen from './screens/DriverScreen';
 import findCars from './screens/findCars';
+import DriverMapScreen from './screens/DriverMapScreen';
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['Setting a timer for a long period of time'])
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -29,6 +32,9 @@ export default function App() {
               <Stack.Screen name="CreateLocation" component={CreateLocation}/>
               <Stack.Screen name="DriverScreen" component={DriverScreen}/>
               <Stack.Screen name="FindCars" component={findCars}/>
+              <Stack.Screen name="DriverMapScreen" component={DriverMapScreen} options={{
+                headerShown: false,
+              }}></Stack.Screen>
               <Stack.Screen name="HomeScreen" component={HomeScreen} options={{
                 headerShown: false,
               }}></Stack.Screen>

@@ -86,7 +86,12 @@ export default function RideOptionsCard(props) {
 
             <View style={tw`mt-auto border-t border-gray-200`}>
                 <TouchableOpacity style={tw`bg-black py-3 m-3`} disabled={!selected}
-                    onPress={() => navigation.navigate("FindCars", {carType: selected.title, carImage: selected.image})}
+                    onPress={() => navigation.navigate("FindCars", {carType: selected.title, carImage: selected.image, drivePrice: Intl.NumberFormat('en-us', {
+                        style: "currency",
+                        currency: "USD"
+                    }).format(
+                        (travelTimeInformation?.duration?.value * SURE_CHARGE_RATE * selected.multiplier)/100
+                    ), driveTime: travelTimeInformation?.duration?.text})}
                 >
                     <Text style={tw`text-center text-white`}>
                         Choose a {selected?.title}
