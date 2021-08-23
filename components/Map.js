@@ -5,14 +5,17 @@ import tw from 'tailwind-react-native-classnames'
 import { useSelector } from 'react-redux'
 import { selectOrigin, selectPickUpLocation } from '../slices/navSlice'
 import { selectDestination } from '../slices/navSlice'
+import { setOrigin } from '../slices/navSlice'
 import { setTravelTimeInformation } from '../slices/navSlice'
 import MapViewDirections from 'react-native-maps-directions'
 import {GOOGLE_MAPS_KEY} from '@env'
 import { useDispatch } from 'react-redux'
+import { auth } from '../firebase'
+import * as Location from 'expo-location'
 
 
 
-export default function Map({isDriverMap}) {
+export default function Map({isDriverMap, navigation}) {
 
     const origin = useSelector(selectOrigin)
  
@@ -25,7 +28,48 @@ export default function Map({isDriverMap}) {
 
     const dispatch = useDispatch();
 
+
+    const [currentPoint, setCurrentPoint] = useState({lat:null, lng:null})
+
+    const [error, setError] = useState(null)
     
+
+    
+    /*
+    setInterval(() => {
+        Location.installWebGeolocationPolyfill()
+
+        let geoOptions = {
+            enableHighAccuracy: true,
+            timeOut: 20000,
+            maximumAge: 60 * 60 * 24
+        };
+
+        function geoSuccess(position){
+            console.log(position.coords.latitude);
+            setCurrentPoint({lat: position.coords.latitude,lng:position.coords.longitude })
+        }
+
+        function geoFailure(err){
+            setError({error: err.message});
+        }
+
+        navigator.geolocation.getCurrentPosition( geoSuccess, 
+            geoFailure,
+            geoOptions);
+
+
+        if (currentPoint != origin.location){
+            dispatch(setOrigin({
+                location: {lat:null, lng:null},
+                description: "You are moving"
+            }))
+        }
+
+        
+        
+    }, 1000);
+    */
 
 
     useEffect(() => {
@@ -37,7 +81,7 @@ export default function Map({isDriverMap}) {
         })
 
 
-    }, [origin, destination])
+    }, [origin, destination, GOOGLE_MAPS_KEY, pickUpLocation, navigation])
 
     useEffect(() => {
         if (!origin || !destination) return;
@@ -53,7 +97,7 @@ export default function Map({isDriverMap}) {
 
         getTravelTime()
 
-    }, [origin, destination, GOOGLE_MAPS_KEY])
+    }, [origin, destination, GOOGLE_MAPS_KEY, pickUpLocation, navigation])
 
 
     function destenationMarker(){
@@ -66,7 +110,7 @@ export default function Map({isDriverMap}) {
             longitude: destination.location.lng
 
         }}
-        title={isDriverMap ? "You will take your client here"  : "This is where you will go"} 
+        title={isDriverMap ? "You will take your client here"  : "Your Elift will take you here"} 
         description={destination.description}
         identifier="destination"
         ></Marker>
@@ -75,8 +119,11 @@ export default function Map({isDriverMap}) {
     }
 
 
+
+
     function pickUpLocationMarker(){
-        if (pickUpLocation != null && isDriverMap == true){
+        if (pickUpLocation != null){
+            console.log(auth.currentUser.displayName + pickUpLocation)
             
             return (
                 <Marker
@@ -85,7 +132,7 @@ export default function Map({isDriverMap}) {
             longitude: pickUpLocation.location.lng
 
         }}
-        title="Pick Up your Client here"
+        title={isDriverMap ? "Pick Up your Client here" : "This is where you are"}
         description={pickUpLocation.description}
         identifier="pickUpLocation"
         ></Marker>
@@ -98,7 +145,7 @@ export default function Map({isDriverMap}) {
     
 
     function drawMapLines(){
-        if (origin != null && destination != null   && isDriverMap == false){
+        if (origin != null && destination != null   &&  pickUpLocation == null){
 
            
             
@@ -114,7 +161,7 @@ export default function Map({isDriverMap}) {
             )
         }
 
-        else if (origin != null && destination != null && pickUpLocation != null && isDriverMap == true){
+        else if (origin != null && destination != null && pickUpLocation != null){
             return (
                 <>
                 <MapViewDirections
@@ -138,6 +185,42 @@ export default function Map({isDriverMap}) {
         }
     }
 
+    //console.log("This is pick up location" + JSON.stringify(pickUpLocation))
+
+
+    function renderOriginMarker(){
+        if (pickUpLocation != null && origin != null && isDriverMap == null){
+            return (
+                <Marker
+            coordinate={{
+            latitude: origin.location.lat,
+            longitude: origin.location.lng
+
+            }}
+            title="This is where your driver currently is"
+            description={origin.description}
+            identifier="origin"
+            ></Marker>
+            )
+        }
+        else  {
+            return (
+                <Marker
+            coordinate={{
+            latitude: origin.location.lat,
+            longitude: origin.location.lng
+
+            }}
+            title={isDriverMap   ? "This is where you are" : pickUpLocation == null ? "You and your driver are here" : "this is where your driver is"}
+            description={origin.description}
+            identifier="origin"
+            ></Marker>
+            )
+
+        }
+        
+    }
+
     
 
     return (
@@ -151,24 +234,22 @@ export default function Map({isDriverMap}) {
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
      }}>
+        
 
         {pickUpLocationMarker()}
-        
-        {drawMapLines()}
-         
-         
-        <Marker
-        coordinate={{
-            latitude: origin.location.lat,
-            longitude: origin.location.lng
 
-        }}
-        title="This is where you are"
-        description={origin.description}
-        identifier="origin"
-        ></Marker>
+        {renderOriginMarker()}
+
+        
+
+        
+         
+         
+        
 
         {destenationMarker()}
+
+        {drawMapLines()}
          
     </MapView>
 

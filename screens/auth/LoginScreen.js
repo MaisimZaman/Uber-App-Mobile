@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation }){
             <StatusBar style="light"></StatusBar>
             <Image
                 source={
-                    {uri: "https://cdn.vox-cdn.com/thumbor/8HW8iithLFbyZ62FRsgHUm3SpMY=/0x34:800x567/1400x1400/filters:focal(0x34:800x567):format(jpeg)/cdn.vox-cdn.com/uploads/chorus_image/image/48711819/IMG_0713.0.0.jpg"}
+                    require("../../assets/Elift_logo.png")
                 }
 
                 style={{width: 200, height: 200}}

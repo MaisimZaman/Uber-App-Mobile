@@ -3,10 +3,13 @@ import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react
 import { auth, db } from '../firebase'
 import tw from 'tailwind-react-native-classnames'
 import { useSelector } from 'react-redux'
-import { selectDestination, selectOrigin } from '../slices/navSlice'
+import { selectDestination, selectOrigin, setDocID } from '../slices/navSlice'
 import {GOOGLE_MAPS_KEY} from '@env'
+import { useDispatch } from 'react-redux'
 
 export default function findCars(props) {
+
+    const dispatch = useDispatch()
 
     const {carType, carImage, drivePrice, driveTime} = props.route.params
 
@@ -15,6 +18,10 @@ export default function findCars(props) {
     const [selected, setSelected] = useState(null)
 
     const [distance, setDistance] = useState('')
+
+    const [requestPending, setRequestpending] = useState(false)
+
+    const [requestAccepted, setRequestAccepted] = useState(null)
 
     const origin = useSelector(selectOrigin)
 
@@ -32,7 +39,40 @@ export default function findCars(props) {
         
     }, [])
 
-    function handleDriverRequest(driverId){
+    /*
+    useEffect(() => {
+        
+        function checkForRequestUpdate(){
+            db.collection("driverRequest")
+                .doc(selected.data.driverId)
+                .collection("thisDriverRequests")
+                .where("clientId", "==", auth.currentUser.uid)
+                .get()
+                .then((snapshot) => {
+                    if (snapshot.size == 0){
+                        requestPending(false)
+                        setRequestAccepted(false)
+                    }
+                    else {
+                        if (snapshot[0].data.accepted == true){
+                            setRequestpending(false)
+                            setRequestAccepted(true)
+                        }
+                    }
+                })
+
+            
+
+            
+
+        }
+
+        checkForRequestUpdate()
+    }, [requestPending, requestAccepted])
+
+    */
+
+    function handleDriverRequest(driverId, loc){
         db.collection("driverRequest")
             .doc(driverId)
             .collection("thisDriverRequests")
@@ -43,8 +83,13 @@ export default function findCars(props) {
                 clientDestination: destenation,
                 drivePrice: drivePrice,
                 driveTime: driveTime,
+                accepted: false,
         
             })
+
+        props.navigation.navigate("WaitingMapScreen", {driverPickUp: loc})
+        dispatch(setDocID(selected.id))
+
     
     }
 
@@ -64,6 +109,8 @@ export default function findCars(props) {
             </View>
         )
     } 
+
+    
 
     return (
         <View>
@@ -96,7 +143,7 @@ export default function findCars(props) {
             ></FlatList>
 
                 <TouchableOpacity style={tw`bg-black py-3 m-3`} disabled={!selected}
-                   onPress={() => handleDriverRequest(selected.data.driverId)}
+                   onPress={() => handleDriverRequest(selected.data.driverId, selected.data.location)}
                 >
                     <Text style={tw`text-center text-white`}>
                         Choose to ride with {selected?.data.driverName}

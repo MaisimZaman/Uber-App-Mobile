@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Uber-App",
-    "slug": "Uber-App",
+    "name": "Elift-App",
+    "slug": "Elift-App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Elift_logo.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -23,7 +23,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.maisimdevelops.EliftApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -8,20 +8,20 @@ import { selectOrigin } from '../slices/navSlice'
 
 const data = [
     {
-        id: "Uber-X-123",
-        title: "UberX",
+        id: "Elift-X-123",
+        title: "Elift-X",
         multiplier: 1,
         image: "https://links.papareact.com/3pn"
     },
     {
-        id: "Uber-XL-456",
-        title: "UberXL",
+        id: "Elift-XL-456",
+        title: "Elift-XL",
         multiplier: 1.75,
         image: "https://links.papareact.com/5w8"
     },
     {
-        id: "Uber-LUX-789",
-        title: "UberLUX",
+        id: "Elift-LUX-789",
+        title: "Elift-LUX",
         multiplier: 1.2,
         image: "https://links.papareact.com/7pf"
     },
@@ -37,14 +37,31 @@ export default function DriverScreen({navigation}) {
 
     useEffect(() => {
         db.collection("drivers").where("driverId", "==",auth.currentUser.uid).get().then((snapshot) => {
+           
             if (snapshot.size > 0){
-                setUberExists(true)
-                navigation.navigate("DriverMapScreen")
+                snapshot.forEach((doc) => {
+
+            
+                    if (doc.data().location.description == origin.description){
+                        setUberExists(true)
+                        navigation.navigate("DriverMapScreen")
+    
+                    }
+                    else {
+                        db.collection("drivers")
+                            .doc(doc.id)
+                            .delete()
+                        setUberExists(false)
+                    }
+            })
 
             }
+
             else {
                 setUberExists(false)
             }
+            
+            
         })
 
     }, [uberExists])
@@ -55,11 +72,13 @@ export default function DriverScreen({navigation}) {
 
     
         db.collection("drivers")
-        .add({
+        .add({ 
             driverName: auth.currentUser.displayName,
             driverId: auth.currentUser.uid,
             uberType: selected.title,
-            location: origin
+            location: origin,
+            reachedPickUp: false,
+            reachedDes: false
         })
 
         setUberExists(true)

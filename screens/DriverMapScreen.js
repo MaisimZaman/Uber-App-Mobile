@@ -11,6 +11,7 @@ import { selectDestination } from '../slices/navSlice';
 import {GOOGLE_MAPS_KEY} from '@env'
 import { Icon } from 'react-native-elements';
 import { db, auth } from '../firebase';
+import DriverStatus from '../components/DriverStatus';
 
 
 export default function DriverMapScreen({navigation}) {
@@ -24,16 +25,25 @@ export default function DriverMapScreen({navigation}) {
     const mainNavigation = navigation
     const [docId, setDocID] = useState('')
 
-
-    function resetDriver(){
+    useEffect(() => {
         db.collection("drivers")
             .where("driverId", "==", auth.currentUser.uid)
             .get()
             .then((snap) => {
-                setDocID(snap[0].id)
+                snap.forEach(doc => {
+                    setDocID(doc.id)
+
+                })
+
+                
 
             })
 
+
+    }, [])
+
+
+    function resetDriver(){
         db.collection("drivers")
             .doc(docId)
             .delete()
@@ -53,7 +63,7 @@ export default function DriverMapScreen({navigation}) {
             </TouchableOpacity>    
 
             <View style={tw`h-1/2`}>
-                <Map isDriverMap={true}></Map>
+                <Map isDriverMap={true} navigation={navigation}></Map>
 
             </View>
 
@@ -65,13 +75,33 @@ export default function DriverMapScreen({navigation}) {
                         options={{headerShown: false}}
                     />
 
+                   
+                    <Stack.Screen
+                        name="DriverStatusCard"
+                        component={DriverStatus}
+                        options={{headerShown: false}}
+                        listeners={({ navigation }) => ({
+                            tabPress: event => {
+                                event.preventDefault();
+                                navigation.navigate("DriverStatusCard")
+                            }})}
+                    />
+
                     
 
                 </Stack.Navigator>
+
+                    
+
+            
+
+                
 
             </View>
         </View>
     )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+
+})

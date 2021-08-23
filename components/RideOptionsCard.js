@@ -9,20 +9,20 @@ import 'intl/locale-data/jsonp/en';
 
 const data = [
     {
-        id: "Uber-X-123",
-        title: "UberX",
+        id: "Elift-X-123",
+        title: "Elift-X",
         multiplier: 1,
         image: "https://links.papareact.com/3pn"
     },
     {
-        id: "Uber-XL-456",
-        title: "UberXL",
+        id: "Elift-XL-456",
+        title: "Elift-XL",
         multiplier: 1.75,
         image: "https://links.papareact.com/5w8"
     },
     {
-        id: "Uber-LUX-789",
-        title: "UberLUX",
+        id: "Elift-LUX-789",
+        title: "Elift-LUX",
         multiplier: 1.2,
         image: "https://links.papareact.com/7pf"
     },
@@ -37,6 +37,16 @@ export default function RideOptionsCard(props) {
     const [selected, setSelected] = useState(null)
     
     const travelTimeInformation = useSelector(selectTravelTimeInformation)
+
+    const destination = useSelector(selectDestination)
+
+    if (destination == null){
+        return (
+            <View>
+                <Text>Please select a Destination before searching for a ride</Text>
+            </View>
+        )
+    }
 
 
     return (

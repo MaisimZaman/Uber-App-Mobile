@@ -5,14 +5,20 @@ import tw from 'tailwind-react-native-classnames';
 import { useDispatch } from 'react-redux';
 import { setDestination, setPickUpLocation } from '../slices/navSlice';
 import { Button } from 'react-native-elements/dist/buttons/Button';
+import { useSelector } from 'react-redux';
+import { selectDocID } from '../slices/navSlice';
 
-export default function ClientRequestCard() {
+export default function ClientRequestCard({navigation}) {
 
     const [requests, setRequests] = useState([]);
 
     const [selected, setSelected] = useState(null)
+    
+    
 
     const dispatch = useDispatch();
+
+    
 
     useEffect(() => {
         dispatch(setDestination(null))
@@ -31,6 +37,16 @@ export default function ClientRequestCard() {
         setSelected(client)
         dispatch(setDestination(client.data.clientDestination))
         dispatch(setPickUpLocation(client.data.clientLocation))
+        db.collection("driverRequest")
+            .doc(client.data.clientId)
+            .collection("thisDriverRequests")
+            .doc(client.id)
+            .update({
+                accepted: true,
+        })
+
+        navigation.navigate("DriverStatusCard")
+
     }
 
     function declineInfo(client){
@@ -40,6 +56,8 @@ export default function ClientRequestCard() {
             .doc(client.id)
             .delete()
     }
+
+   
 
     if (requests.length == 0){
         return (

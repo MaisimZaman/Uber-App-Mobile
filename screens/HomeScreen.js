@@ -28,7 +28,7 @@ export default function HomeScreen({ navigation }) {
                     width: 100, height: 100, resizeMode: 'contain'
                 }}
                 source={
-                    {uri: "https://logos-world.net/wp-content/uploads/2020/05/Uber-Emblem.png"}
+                    require("../assets/Elift_logo.png")
                 }
             />
         </View>
@@ -47,7 +47,7 @@ export default function HomeScreen({ navigation }) {
                     description: data.description
                 }))
 
-                setDestination(null)
+                //setDestination(null)
 
             }}
             fetchDetails={true}

@@ -15,6 +15,8 @@ import CreateLocation from './screens/CreateLocation';
 import DriverScreen from './screens/DriverScreen';
 import findCars from './screens/findCars';
 import DriverMapScreen from './screens/DriverMapScreen';
+import WaitingMapScreen from './screens/WaitingMapScreen';
+import MyLocation from './screens/MyLocation';
 import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['Setting a timer for a long period of time'])
 
@@ -32,7 +34,11 @@ export default function App() {
               <Stack.Screen name="CreateLocation" component={CreateLocation}/>
               <Stack.Screen name="DriverScreen" component={DriverScreen}/>
               <Stack.Screen name="FindCars" component={findCars}/>
+              <Stack.Screen name="MyLocation" component={MyLocation} options={{headerShown: false}}/>
               <Stack.Screen name="DriverMapScreen" component={DriverMapScreen} options={{
+                headerShown: false,
+              }}></Stack.Screen>
+              <Stack.Screen name="WaitingMapScreen" component={WaitingMapScreen} options={{
                 headerShown: false,
               }}></Stack.Screen>
               <Stack.Screen name="HomeScreen" component={HomeScreen} options={{

@@ -15,9 +15,10 @@ import { setPickUpLocation } from '../slices/navSlice';
 import { setOrigin } from '../slices/navSlice';
 import { Icon } from 'react-native-elements';
 import DriverWaitingCard from '../components/DriverWaitingCard';
+import { setDocID } from '../slices/navSlice';
 
 
-export default function MapScreen(props) {
+export default function WaitingMapScreen(props) {
 
     const dispatch = useDispatch();
 
@@ -26,6 +27,8 @@ export default function MapScreen(props) {
     const navigation = props.navigation
 
     const {driverPickUp} = props.route.params
+
+    
 
 
     const Stack = createStackNavigator();
@@ -54,23 +57,15 @@ export default function MapScreen(props) {
             <View style={tw`h-1/2`}>
                 <Stack.Navigator >
                     <Stack.Screen
-                        name="NavigateCard"
-                        component={NavigateCard}
-                        options={{headerShown: false}}
-                       
-                    />
-
-                    <Stack.Screen
-                        name="RideOptionsCard"
-                        component={RideOptionsCard}
-                        options={{headerShown: false}}
-                        
-                    />
-
-                    <Stack.Screen
                         name="DriverWaitingCard"
                         component={DriverWaitingCard}
                         options={{headerShown: false}}
+                        
+                        listeners={({ navigation }) => ({
+                            tabPress: event => {
+                                event.preventDefault();
+                                navigation.navigate("DriverWaitingCard")
+                            }})}
                         
                     />
 
